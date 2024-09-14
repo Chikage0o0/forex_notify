@@ -15,7 +15,7 @@ COPY . .
 RUN source $HOME/.cargo/env && cargo build --release
 
 # 使用Alpine镜像作为最终运行时环境
-FROM alpine:latest
+FROM scratch
 WORKDIR /app
 
 # 根据平台选择对应的构建产物
