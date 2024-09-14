@@ -1,0 +1,42 @@
+[package]
+name = "forex_notify"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = { version = "0.1.82" }
+enum_dispatch = { version = "0.3.13" }
+reqwest = { version = "0.12.7", default-features = false, features = [
+    "charset",
+    "rustls-tls",
+    "http2",
+] }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = { version = "1.0.128" }
+snafu = "0.8.4"
+tokio = { version = "1.40.0", features = ["rt", "signal", "macros"] }
+toml = "0.8.19"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+config = { version = "0.14.0", default-features = false, features = ["toml"] }
+directories = "5.0.1"
+
+[dev-dependencies]
+eventsource-client = "0.13.0"
+futures-util = "0.3.30"
+[dev-dependencies.uuid]
+version = "1.10.0"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
+
+
+[profile.release]
+lto = true        # 启用链接时优化
+debug = 0         # 禁用调试信息
+opt-level = "z"   # 优化文件大小
+panic = 'abort'   # 在 panic 时直接中止
+codegen-units = 1 # 减少代码生成单元数量以提升优化效果
+strip = true      # 自动去掉符号表

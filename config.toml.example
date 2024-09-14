@@ -1,0 +1,16 @@
+log_level = "info"
+warning_threshold = 0.998
+api_key = "demo"
+sleeptime = 180
+
+[[notifiers]]
+type = "Telegram"
+token = "token"
+chat_id = "chat_id"
+
+[[notifiers]]
+type = "Ntfy"
+url = "url"
+token = "token"
+title = "title"
+priority = 4
