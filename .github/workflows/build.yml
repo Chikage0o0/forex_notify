@@ -1,0 +1,69 @@
+name: Rust Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        bin: forex_notify
+        platforms:
+          - { release_for: Linux-x86_64, target: x86_64-unknown-linux-musl, os: ubuntu-latest, name_suffix: Linux-x86_64, cmd: cross }
+          - { release_for: Linux-arm64, target: aarch64-unknown-linux-musl, os: ubuntu-latest, name_suffix: Linux-arm64, cmd: cross }
+          - { release_for: Windows-x86_64, target: x86_64-pc-windows-msvc, os: windows-latest, name_suffix: Windows-x86_64, cmd: cargo }
+          - { release_for: Windows-arm64, target: aarch64-pc-windows-msvc, os: windows-latest, name_suffix: Windows-arm64, cmd: cargo }
+
+    runs-on: ${{ matrix.platforms.os }}
+    env:
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Cross (Linux only)
+        if: matrix.platforms.os == 'ubuntu-latest'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/cross
+          key: ${{ runner.os }}-cross-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cross-
+
+      - name: Install Rust toolchain and target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platforms.target }}
+
+      - name: Install Cross if not cached (Linux only)
+        if: matrix.platforms.os == 'ubuntu-latest'
+        run: |
+          if [ ! -f ~/.cargo/bin/cross ]; then
+            cargo install cross
+          fi
+
+      - name: Cache Rust build
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ matrix.platforms.target }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ matrix.platforms.target }}-
+
+      - name: Build binary
+        run: ${{ matrix.platforms.cmd }} build --release --target ${{ matrix.platforms.target }}
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.bin }}-${{ matrix.platforms.name_suffix }}
+          path: target/${{ matrix.platforms.target }}/release/${{ matrix.bin }}${{ matrix.platforms.os == 'windows-latest' && '.exe' || '' }}
