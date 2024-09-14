@@ -57,42 +57,40 @@ async fn run_forex(
         let cnh_cny = price1.unwrap() / price2.unwrap();
 
         if cnh_cny < warning_threshold {
-            if under_threshold {
-                continue;
-            }
-            info!(
-                "CNH/CNY is below the warning threshold: {:.3}",
-                cnh_cny * 100.0
-            );
-            under_threshold = true;
-            let message = format!("CNH/CNY低于预设值，为:{:.3}", (cnh_cny * 100.0));
-            for notifier in notifiers.iter() {
-                let _ = notifier
-                    .send_message(&message)
-                    .await
-                    .inspect_err(|e| {
-                        warn!("Failed to send the message use {:?}: {}", notifier, e);
-                    })
-                    .inspect(|_| debug!("Successfully sent the message use {:?}", notifier));
+            if !under_threshold {
+                info!(
+                    "CNH/CNY is below the warning threshold: {:.3}",
+                    cnh_cny * 100.0
+                );
+                under_threshold = true;
+                let message = format!("CNH/CNY低于预设值，为:{:.3}", (cnh_cny * 100.0));
+                for notifier in notifiers.iter() {
+                    let _ = notifier
+                        .send_message(&message)
+                        .await
+                        .inspect_err(|e| {
+                            warn!("Failed to send the message use {:?}: {}", notifier, e);
+                        })
+                        .inspect(|_| debug!("Successfully sent the message use {:?}", notifier));
+                }
             }
         } else {
-            if !under_threshold {
-                continue;
-            }
-            info!(
-                "CNH/CNY is above the warning threshold: {:.3}",
-                cnh_cny * 100.0
-            );
-            under_threshold = false;
-            let message = format!("CNH/CNY高于预设值，为:{:.3}", (cnh_cny * 100.0));
-            for notifier in notifiers.iter() {
-                let _ = notifier
-                    .send_message(&message)
-                    .await
-                    .inspect_err(|e| {
-                        warn!("Failed to send the message use {:?}: {}", notifier, e);
-                    })
-                    .inspect(|_| debug!("Successfully sent the message use {:?}", notifier));
+            if under_threshold {
+                info!(
+                    "CNH/CNY is above the warning threshold: {:.3}",
+                    cnh_cny * 100.0
+                );
+                under_threshold = false;
+                let message = format!("CNH/CNY高于预设值，为:{:.3}", (cnh_cny * 100.0));
+                for notifier in notifiers.iter() {
+                    let _ = notifier
+                        .send_message(&message)
+                        .await
+                        .inspect_err(|e| {
+                            warn!("Failed to send the message use {:?}: {}", notifier, e);
+                        })
+                        .inspect(|_| debug!("Successfully sent the message use {:?}", notifier));
+                }
             }
         }
 
