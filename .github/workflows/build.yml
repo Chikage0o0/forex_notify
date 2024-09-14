@@ -12,7 +12,6 @@ jobs:
   build:
     strategy:
       matrix:
-        bin: forex_notify
         platforms:
           - { release_for: Linux-x86_64, target: x86_64-unknown-linux-musl, os: ubuntu-latest, name_suffix: Linux-x86_64, cmd: cross }
           - { release_for: Linux-arm64, target: aarch64-unknown-linux-musl, os: ubuntu-latest, name_suffix: Linux-arm64, cmd: cross }
@@ -22,6 +21,7 @@ jobs:
     runs-on: ${{ matrix.platforms.os }}
     env:
       CARGO_TERM_COLOR: always
+      BIN: forex_notify
 
     steps:
       - name: Checkout repository
@@ -65,5 +65,5 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.bin }}-${{ matrix.platforms.name_suffix }}
-          path: target/${{ matrix.platforms.target }}/release/${{ matrix.bin }}${{ matrix.platforms.os == 'windows-latest' && '.exe' || '' }}
+          name: ${{ env.BIN }}-${{ matrix.platforms.name_suffix }}
+          path: target/${{ matrix.platforms.target }}/release/${{ env.BIN }}${{ matrix.platforms.os == 'windows-latest' && '.exe' || '' }}
