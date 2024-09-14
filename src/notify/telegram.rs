@@ -56,11 +56,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_send_message() {
-        let telegram = Telegram::new(
-            "7089203368:AAEn0EX6_V5_cAuUTKRdM1JGYiyXUFtidyo",
-            "308930706",
-        );
+        let telegram = Telegram::new("token", "chat_id");
         let message = "Hello, world!";
-        telegram.send_message(message).await.unwrap();
+        let ret = telegram.send_message(message).await;
+        let error = ret.unwrap_err();
+        dbg!(&error.to_string());
+        assert!(error.to_string().contains("(404 Not Found)"));
     }
 }
