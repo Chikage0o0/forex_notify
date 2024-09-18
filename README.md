@@ -4,7 +4,7 @@
 该项目主要用于监控CNH/CNY实时汇率，当汇率达到预设阈值时，可以通过设置的Ntfy.sh或者Telegram发送通知。
 
 ## Todo
-- [ ] 通过Webhook发送通知
+- [x] 通过Webhook发送通知
 
 ## 使用方法
 
@@ -26,6 +26,20 @@ url = "url"     # https://ntfy.sh/test
 token = "token" # optional
 title = "title"
 priority = 4
+
+[[notifiers]]
+type = "Webhook"
+url = "http://example.com"          # Webhook地址
+template = '''
+{
+    "under_threshold": {under_threshold},
+    "rate": {rate}
+}
+'''                                 # Webhook模板    {under_threshold} 为是否低于阈值，{rate} 为当前汇率
+method = "POST"                     # Webhook请求方法             GET/POST/PUT
+
+[notifiers.headers]                 # Webhook请求头
+Content-Type = "application/json"
 ```
 
 ### Docker

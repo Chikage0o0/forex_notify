@@ -6,6 +6,7 @@ use std::fmt::Debug;
 
 pub mod ntfy;
 pub mod telegram;
+pub mod webhook;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(tag = "type")]
@@ -13,6 +14,7 @@ pub mod telegram;
 pub enum NotifyType {
     Telegram(telegram::Telegram),
     Ntfy(ntfy::Ntfy),
+    Webhook(webhook::Webhook),
 }
 
 #[async_trait]

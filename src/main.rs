@@ -54,7 +54,7 @@ async fn run_forex(
             tokio::time::sleep(tokio::time::Duration::from_secs(sleeptime)).await;
             continue;
         }
-        let cnh_cny = price1.unwrap() / price2.unwrap();
+        let cnh_cny = price2.unwrap() / price1.unwrap();
 
         if cnh_cny < warning_threshold {
             if !under_threshold {
@@ -65,9 +65,14 @@ async fn run_forex(
                 under_threshold = true;
                 let message = format!("CNH/CNY低于预设值，为:{:.3}", (cnh_cny * 100.0));
                 for notifier in notifiers.iter() {
-                    let _ = notifier
-                        .send_message(&message)
-                        .await
+                    let ret = if let NotifyType::Webhook(webhook) = notifier {
+                        let message = webhook.generate_message(under_threshold, cnh_cny);
+                        webhook.send_message(&message).await
+                    } else {
+                        notifier.send_message(&message).await
+                    };
+
+                    let _ = ret
                         .inspect_err(|e| {
                             warn!("Failed to send the message use {:?}: {}", notifier, e);
                         })
@@ -83,9 +88,14 @@ async fn run_forex(
                 under_threshold = false;
                 let message = format!("CNH/CNY高于预设值，为:{:.3}", (cnh_cny * 100.0));
                 for notifier in notifiers.iter() {
-                    let _ = notifier
-                        .send_message(&message)
-                        .await
+                    let ret = if let NotifyType::Webhook(webhook) = notifier {
+                        let message = webhook.generate_message(under_threshold, cnh_cny);
+                        webhook.send_message(&message).await
+                    } else {
+                        notifier.send_message(&message).await
+                    };
+
+                    let _ = ret
                         .inspect_err(|e| {
                             warn!("Failed to send the message use {:?}: {}", notifier, e);
                         })

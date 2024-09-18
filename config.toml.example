@@ -14,3 +14,17 @@ url = "url"
 token = "token"
 title = "title"
 priority = 4
+
+[[notifiers]]
+type = "Webhook"
+url = "http://example.com"
+template = '''
+{
+    "under_threshold": {under_threshold},
+    "rate": {rate}
+}
+'''
+method = "POST"
+
+[notifiers.headers]
+Content-Type = "application/json"

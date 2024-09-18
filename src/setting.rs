@@ -67,7 +67,13 @@ fn get_config_path(env_name: &str, project_dir: Option<ProjectDirs>) -> PathBuf 
 
 #[cfg(test)]
 mod tests {
-    use crate::notify::{ntfy::Ntfy, telegram::Telegram};
+    use std::collections::HashMap;
+
+    use crate::notify::{
+        ntfy::Ntfy,
+        telegram::Telegram,
+        webhook::{Method, Webhook},
+    };
 
     use super::*;
 
@@ -80,6 +86,18 @@ mod tests {
             notifiers: vec![
                 NotifyType::Telegram(Telegram::new("token", "chat_id")),
                 NotifyType::Ntfy(Ntfy::new("url", Some("token"), Some("title"), Some(4))),
+                NotifyType::Webhook(Webhook::new(
+                    "http://example.com",
+                    HashMap::from([("Content-Type".to_string(), "application/json".to_string())]),
+                    Some(
+                        "{
+                        \"under_threshold\": {under_threshold},
+                        \"rate\": {rate}
+                    }"
+                        .to_string(),
+                    ),
+                    Method::POST,
+                )),
             ],
             sleeptime: 180,
         };
