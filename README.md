@@ -36,7 +36,7 @@ template = '''
     "rate": {rate}
 }
 '''                                 # Webhook模板    {under_threshold} 为是否低于阈值，{rate} 为当前汇率
-method = "POST"                     # Webhook请求方法             GET/POST/PUT
+method = "Post"                     # Webhook请求方法             GET/POST/PUT
 
 [notifiers.headers]                 # Webhook请求头
 Content-Type = "application/json"

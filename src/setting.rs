@@ -96,7 +96,7 @@ mod tests {
                     }"
                         .to_string(),
                     ),
-                    Method::POST,
+                    Method::Post,
                 )),
             ],
             sleeptime: 180,

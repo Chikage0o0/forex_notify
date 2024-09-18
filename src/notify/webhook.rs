@@ -14,17 +14,17 @@ pub struct Webhook {
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum Method {
-    GET,
-    POST,
-    PUT,
+    Get,
+    Post,
+    Put,
 }
 
-impl Into<reqwest::Method> for Method {
-    fn into(self) -> reqwest::Method {
-        match self {
-            Method::GET => reqwest::Method::GET,
-            Method::POST => reqwest::Method::POST,
-            Method::PUT => reqwest::Method::PUT,
+impl From<Method> for reqwest::Method {
+    fn from(val: Method) -> Self {
+        match val {
+            Method::Get => reqwest::Method::GET,
+            Method::Post => reqwest::Method::POST,
+            Method::Put => reqwest::Method::PUT,
         }
     }
 }
@@ -51,6 +51,7 @@ impl Notify for Webhook {
 }
 
 impl Webhook {
+    #[allow(dead_code)]
     pub fn new(
         url: &str,
         headers: HashMap<String, String>,
@@ -84,7 +85,7 @@ mod tests {
             url: "http://example.com".to_string(),
             headers: HashMap::new(),
             template: Some("CNH/CNY is below the warning threshold: {rate}".to_string()),
-            method: Method::POST,
+            method: Method::Post,
         };
 
         let message = webhook.generate_message(true, 6.5);
@@ -97,7 +98,7 @@ mod tests {
             url: "http://example.com".to_string(),
             headers: HashMap::new(),
             template: None,
-            method: Method::POST,
+            method: Method::Post,
         };
 
         let message = webhook.generate_message(true, 6.5);
@@ -106,13 +107,13 @@ mod tests {
 
     #[test]
     fn test_into_reqwest_method() {
-        let method: reqwest::Method = Method::GET.into();
+        let method: reqwest::Method = Method::Get.into();
         assert_eq!(method, reqwest::Method::GET);
 
-        let method: reqwest::Method = Method::POST.into();
+        let method: reqwest::Method = Method::Post.into();
         assert_eq!(method, reqwest::Method::POST);
 
-        let method: reqwest::Method = Method::PUT.into();
+        let method: reqwest::Method = Method::Put.into();
         assert_eq!(method, reqwest::Method::PUT);
     }
 
@@ -142,7 +143,7 @@ mod tests {
             }"
                 .to_string(),
             ),
-            method: Method::POST,
+            method: Method::Post,
         };
 
         let message = webhook.generate_message(true, 6.5);

@@ -24,7 +24,7 @@ template = '''
     "rate": {rate}
 }
 '''
-method = "POST"
+method = "Post"
 
 [notifiers.headers]
 Content-Type = "application/json"

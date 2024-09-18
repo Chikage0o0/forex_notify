@@ -79,28 +79,26 @@ async fn run_forex(
                         .inspect(|_| debug!("Successfully sent the message use {:?}", notifier));
                 }
             }
-        } else {
-            if under_threshold {
-                info!(
-                    "CNH/CNY is above the warning threshold: {:.3}",
-                    cnh_cny * 100.0
-                );
-                under_threshold = false;
-                let message = format!("CNH/CNY高于预设值，为:{:.3}", (cnh_cny * 100.0));
-                for notifier in notifiers.iter() {
-                    let ret = if let NotifyType::Webhook(webhook) = notifier {
-                        let message = webhook.generate_message(under_threshold, cnh_cny);
-                        webhook.send_message(&message).await
-                    } else {
-                        notifier.send_message(&message).await
-                    };
+        } else if under_threshold {
+            info!(
+                "CNH/CNY is above the warning threshold: {:.3}",
+                cnh_cny * 100.0
+            );
+            under_threshold = false;
+            let message = format!("CNH/CNY高于预设值，为:{:.3}", (cnh_cny * 100.0));
+            for notifier in notifiers.iter() {
+                let ret = if let NotifyType::Webhook(webhook) = notifier {
+                    let message = webhook.generate_message(under_threshold, cnh_cny);
+                    webhook.send_message(&message).await
+                } else {
+                    notifier.send_message(&message).await
+                };
 
-                    let _ = ret
-                        .inspect_err(|e| {
-                            warn!("Failed to send the message use {:?}: {}", notifier, e);
-                        })
-                        .inspect(|_| debug!("Successfully sent the message use {:?}", notifier));
-                }
+                let _ = ret
+                    .inspect_err(|e| {
+                        warn!("Failed to send the message use {:?}: {}", notifier, e);
+                    })
+                    .inspect(|_| debug!("Successfully sent the message use {:?}", notifier));
             }
         }
 

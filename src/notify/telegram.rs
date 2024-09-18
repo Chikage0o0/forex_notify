@@ -35,7 +35,7 @@ impl Notify for Telegram {
 
         let client = reqwest::Client::new();
         let response = client
-            .post(&format!(
+            .post(format!(
                 "https://api.telegram.org/bot{}/sendMessage",
                 token
             ))
